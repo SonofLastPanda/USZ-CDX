@@ -1,3 +1,5 @@
+#aim is to find the number of occurences oncogene, tumor suppressor gene and fusion genes in each sample
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
