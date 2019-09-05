@@ -1,4 +1,5 @@
 #Finding the locations of the cdx mutations in Cosmic file.
+#Cosmic file is available in:https://cancer.sanger.ac.uk/cosmic/download
 
 import gzip
 import csv
