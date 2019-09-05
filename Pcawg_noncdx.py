@@ -3,11 +3,11 @@ import gzip
 import re
 import csv
 
-cdx_genes_file = "cdx_genes.txt"
+cdx_genes_file = "cdx_genes.txt" #the file that contains cdx genes
 c_file=open(cdx_genes_file)
 cdx_genes=[]
-NotExistPCAWG=open("nexistgenes_barcode.txt",'w')
-#Bar_File=open("Barcodes.txt",'w')
+NotExistPCAWG=open("nexistgenes_barcode.txt",'w') #output file to store the patients and their information.
+
 def takeString(word):
     fil_word=""
     for a in word:
@@ -50,42 +50,12 @@ def IsCosmic(word1,word2,word3):
             if(list[0]==word2 and list[1]==word3):
                 b=True
     return b
-'''
-cosmic_dict={}
-Cosmic_f=gzip.open("CosmicGenomeScreenMutantExport.tsv.gz")
 
-for l in csv.reader(Cosmic_f, dialect="excel-tab"):
-    C_info=ChromosomeInfo(l[23])
-    if(cosmic_dict.get(C_info[0],'None')=='None'):
-        cosmic_dict[C_info[0]]=[[C_info[1],C_info[2]]]
-    else:
-        cosmic_dict[C_info[0]].append([C_info[1],C_info[2]])
-census=open("cancer_gene_census.txt")
 
-def Role(word):
-    if("oncogene" in word):
-        return "oncogene"
-    elif("TSG" in word):
-        return "TSG"
-    else:
-        return "fusion"
-#tsg_list=[]
-
-for line in census:
-    line=line.strip('\r\n')
-    line=line.split('\t')
-    gene=line[0]
-    role=line[14]
-    if(Role(role)=='TSG'):
-        tsg_list.append(gene)
-'''
-
-ignored={}
-out_data={}
-genes={}
-var_type={}
-f=gzip.open("October_2016_whitelist_2583.snv_mnv_indel.maf.gzip")
-#f=gzip.open("pcawg_dummy.maf.gz")
+ignored={} #dictionary to store ignored barcodes
+genes={} #dictionary for storing the genes
+var_type={} #dictionary for storing variation types 
+f=gzip.open("October_2016_whitelist_2583.snv_mnv_indel.maf.gzip") #PCAWG file
 i=1
 
 
@@ -94,38 +64,23 @@ for line in csv.reader(f, dialect="excel-tab"):
         i+=1
         continue
     else:
-        app=line[0]
+        app=line[0] #the gene in the line
         if(app != "Unknown"):
-        #Bar_File.write('{}\n'.format(line[12]))
-            if(ignored.get(line[12],'None')== 'None'):
-                if(app not in cdx_genes):
-                    #out_data.update({line[12]:line[12]})
-                    #print(line[12])
-                    if(genes.get(line[12],'None') == 'None'):
+            if(ignored.get(line[12],'None')== 'None'): #if the patient barcode is not ignored yet
+                if(app not in cdx_genes): #if the gene is not a cdx gene
+                    if(genes.get(line[12],'None') == 'None'): #if the info. of the patient is not created yet, create.
                         list_app=[app]
                         list_var=[line[5]]
                         genes[line[12]]=list_app
                         var_type[line[12]]=list_var
-                    else:
+                    else: #if it is already created, append the existing one.
                         genes[line[12]].append(app)
                         var_type[line[12]].append(line[5])
-                else:
-                    #if(IsCosmic(line[1],line[2],line[3])==True or (app in tsg_list and (line[5].find("Frame_Shift") != -1 or line[5].find("Nonsense")!= -1))):
+                else: #if the gene is a cdx gene, ignore the patient barcode and remove the info. from the other dictionaries.
                     ignored.update({line[12]:line[12]})
-                    #out_data.pop(line[12],'None')
                     genes.pop(line[12],'None')
                     var_type.pop(line[12],'None')
-                    '''
-                    else:
-                        if(genes.get(line[12],'None') == 'None'):
-                            list_app=[app]
-                            list_var=[line[5]]
-                            genes[line[12]]=list_app
-                            var_type[line[12]]=list_var
-                        else:
-                            genes[line[12]].append(app)
-                            var_type[line[12]].append(line[5])
-                    '''
+                   
 
 i_list=[]
 NotExistPCAWG.write('{a}\t{b}\t{c}\t{d}\t\n'.format(a="Tumor_Sample_Barcode",b="Mutated Genes",c="Var_Type",d="Vus_number"))
